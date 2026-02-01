@@ -90,6 +90,13 @@ const App = () => {
     localStorage.setItem('shopping-categories', JSON.stringify(categories));
   }, [categories]);
 
+  const getOutCount = (cat) => {
+    if (cat === 'すべて') {
+      return items.filter(i => (i.is_out ?? true) && !NON_CYCLIC_CATEGORIES.includes(i.category)).length;
+    }
+    return items.filter(i => (i.is_out ?? true) && i.category === cat).length;
+  };
+
   const itemsWithPrediction = useMemo(() => {
     return items.map(item => {
       const isOut = item.is_out ?? true; // Default to true if null
