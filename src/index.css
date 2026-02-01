@@ -106,13 +106,6 @@ body {
   color: var(--primary);
 }
 
-/* Tabs */
-.tabs-container {
-  background: var(--glass);
-  border-bottom: 1px solid var(--glass-border);
-  padding: 4px 0;
-}
-
 .tabs-list-wrapper {
   display: flex;
   overflow-x: auto;
@@ -128,7 +121,8 @@ body {
 
 /* Hide Swiper built-in pagination */
 .swiper-pagination,
-.swiper-pagination-bullet {
+.swiper-pagination-bullet,
+.swiper-pagination-bullets {
   display: none !important;
 }
 
@@ -140,13 +134,12 @@ body {
   cursor: pointer;
   padding: 10px 20px;
   border-radius: 999px;
-  transition: background 0.2s ease, color 0.2s ease;
-  background: white;
+  transition: all 0.2s ease;
+  background-color: white;
   border: 1px solid var(--glass-border);
   user-select: none;
   position: relative;
   touch-action: pan-x;
-  /* Crucial for scrolling vs dragging */
 }
 
 .tab-badge {
@@ -154,7 +147,6 @@ body {
   top: -4px;
   right: -4px;
   background: #ef4444;
-  /* Notification Red */
   color: white;
   font-size: 0.65rem;
   font-weight: 900;
@@ -172,7 +164,7 @@ body {
 
 .tab-item.active {
   color: white;
-  background: var(--primary);
+  background-color: var(--primary) !important;
   box-shadow: 0 4px 12px var(--primary-glow);
 }
 
