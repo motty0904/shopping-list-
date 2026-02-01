@@ -216,16 +216,16 @@ const App = () => {
         </div>
         <motion.h1
           animate={{
-            x: [-15, 15, -10, 10, -5, 5, 0],
-            y: [-10, 5, -15, 10, -5, 0],
-            rotate: [0, 5, -5, 3, -3, 0]
+            x: [-60, 60, -60],
+            y: [-10, 10, 0, -10],
+            rotate: [-5, 5, -5]
           }}
           transition={{
-            duration: 8,
+            duration: 12,
             repeat: Infinity,
-            ease: "easeInOut",
-            times: [0, 0.2, 0.4, 0.6, 0.8, 0.9, 1]
+            ease: "linear"
           }}
+          style={{ width: '100%', display: 'flex', justifyContent: 'center' }}
         >
           ✨ みぽりの買い物リスト ✨
         </motion.h1>
