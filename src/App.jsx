@@ -39,6 +39,40 @@ const predictEmoji = (name) => {
   return '';
 };
 
+const TabItem = ({ cat, idx, activeCategory, onClick, dragControls, badgeCount }) => {
+  const [isPressing, setIsPressing] = useState(false);
+  const timerRef = useRef(null);
+
+  const handlePointerDown = (e) => {
+    setIsPressing(true);
+    timerRef.current = setTimeout(() => {
+      dragControls.start(e);
+    }, 500); // 0.5s long press
+  };
+
+  const handlePointerUp = () => {
+    clearTimeout(timerRef.current);
+    setIsPressing(false);
+  };
+
+  return (
+    <Reorder.Item
+      value={cat}
+      dragControls={dragControls}
+      dragListener={false}
+      className={`tab-item ${activeCategory === cat ? 'active' : ''}`}
+      onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerUp}
+      onPointerLeave={handlePointerUp}
+      animate={{ scale: isPressing ? 1.1 : 1 }}
+      onClick={onClick}
+    >
+      {cat}
+      {badgeCount > 0 && <span className="tab-badge">{badgeCount}</span>}
+    </Reorder.Item>
+  );
+};
+
 const App = () => {
   const [categories, setCategories] = useState(() => {
     const saved = localStorage.getItem('shopping-categories');
@@ -267,22 +301,25 @@ const App = () => {
           axis="x"
           values={categories}
           onReorder={setCategories}
-          className="swiper-pagination-custom"
-          style={{ overflowX: 'auto', display: 'flex' }}
+          className="tabs-list-wrapper"
         >
-          {categories.map((cat, idx) => (
-            <Reorder.Item
-              key={cat}
-              value={cat}
-              className={`tab-item ${activeCategory === cat ? 'active' : ''}`}
-              onPointerDown={() => {
-                setActiveCategory(cat);
-                swiper?.slideTo(idx);
-              }}
-            >
-              {cat}
-            </Reorder.Item>
-          ))}
+          {categories.map((cat, idx) => {
+            const dragControls = Reorder.useDragControls();
+            return (
+              <TabItem
+                key={cat}
+                cat={cat}
+                idx={idx}
+                activeCategory={activeCategory}
+                dragControls={dragControls}
+                badgeCount={getOutCount(cat)}
+                onClick={() => {
+                  setActiveCategory(cat);
+                  swiper?.slideTo(idx);
+                }}
+              />
+            );
+          })}
         </Reorder.Group>
       </div>
 
