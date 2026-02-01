@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Plus, Check, Calendar, Trash2, Bell, Sparkles, ShoppingBag, ArrowRightLeft, Wifi, X, Info, Cloud } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Reorder } from 'framer-motion';
 import { format, addDays, differenceInDays } from 'date-fns';
 import { ja } from 'date-fns/locale';
 
@@ -11,7 +11,7 @@ import './index.css';
 
 import { supabase } from './supabaseClient';
 
-const CATEGORIES = ['食品', 'すべて', '美穂', 'その他', '生活用品', 'おそうじ', '子供', '100均', '明則'];
+const INITIAL_CATEGORIES = ['食品', 'すべて', '美穂', 'その他', '生活用品', 'おそうじ', '子供', '100均', '明則'];
 const NON_CYCLIC_CATEGORIES = ['食品'];
 
 const EMOJI_MAP = {
@@ -40,16 +40,20 @@ const predictEmoji = (name) => {
 };
 
 const App = () => {
-  const [items, setItems] = useState([]);
-  const [activeCategory, setActiveCategory] = useState(CATEGORIES[0]);
+  const [categories, setCategories] = useState(() => {
+    const saved = localStorage.getItem('shopping-categories');
+    return saved ? JSON.parse(saved) : INITIAL_CATEGORIES;
+  });
+  const [activeCategory, setActiveCategory] = useState(categories[0]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isInfoOpen, setIsInfoOpen] = useState(false);
   const [newItemName, setNewItemName] = useState('');
-  const [newItemCategory, setNewItemCategory] = useState(CATEGORIES[1]);
+  const [newItemCategory, setNewItemCategory] = useState(categories[1] || '食品');
   const [swiper, setSwiper] = useState(null);
   const [movingItemId, setMovingItemId] = useState(null);
   const [isSyncing, setIsSyncing] = useState(false);
   const longPressTimer = useRef(null);
+  const [items, setItems] = useState([]);
 
   const fetchItems = async () => {
     setIsSyncing(true);
@@ -82,6 +86,9 @@ const App = () => {
       supabase.removeChannel(channel);
     };
   }, []);
+  useEffect(() => {
+    localStorage.setItem('shopping-categories', JSON.stringify(categories));
+  }, [categories]);
 
   const itemsWithPrediction = useMemo(() => {
     return items.map(item => {
@@ -238,17 +245,32 @@ const App = () => {
       </header>
 
       <div className="tabs-container">
-        <div className="swiper-pagination-custom">
-          {CATEGORIES.map((cat, idx) => (
-            <div key={cat} className={`tab-item ${activeCategory === cat ? 'active' : ''}`} onClick={() => { setActiveCategory(cat); swiper?.slideTo(idx); }}>
+        <Reorder.Group axis="x" values={categories} onReorder={setCategories} className="swiper-pagination-custom">
+          {categories.map((cat, idx) => (
+            <Reorder.Item
+              key={cat}
+              value={cat}
+              className={`tab-item ${activeCategory === cat ? 'active' : ''}`}
+              onClick={() => {
+                setActiveCategory(cat);
+                swiper?.slideTo(idx);
+              }}
+            >
               {cat}
-            </div>
+            </Reorder.Item>
           ))}
-        </div>
+        </Reorder.Group>
       </div>
 
-      <Swiper onSwiper={setSwiper} onSlideChange={(s) => setActiveCategory(CATEGORIES[s.activeIndex])} style={{ flex: 1, width: '100%' }}>
-        {CATEGORIES.map(cat => (
+      <Swiper
+        onSwiper={setSwiper}
+        onSlideChange={(s) => setActiveCategory(categories[s.activeIndex])}
+        style={{ flex: 1, width: '100%' }}
+        speed={400}
+        touchResistance={0.9}
+        threshold={10}
+      >
+        {categories.map(cat => (
           <SwiperSlide key={cat}>
             <div className="item-list">
               <AnimatePresence mode="popLayout">
@@ -289,7 +311,7 @@ const App = () => {
                       {movingItemId === item.id && (
                         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="move-menu" style={{ top: '10%', left: '50%', transform: 'translateX(-50%)' }}>
                           <div style={{ padding: '4px 8px', fontSize: '0.7rem', fontWeight: 800, color: 'var(--primary)' }}><ArrowRightLeft size={10} style={{ marginRight: 4 }} /> どこに移動する？</div>
-                          {CATEGORIES.filter(c => c !== 'すべて' && c !== item.category).map(c => (
+                          {categories.filter(c => c !== 'すべて' && c !== item.category).map(c => (
                             <div key={c} className="move-option" onClick={() => moveItem(item.id, c)}>{c}へ</div>
                           ))}
                           <div className="move-option" style={{ color: '#ef4444' }} onClick={() => setMovingItemId(null)}>キャンセル</div>
@@ -351,7 +373,7 @@ const App = () => {
               <div className="form-group">
                 <label>カテゴリ</label>
                 <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                  {CATEGORIES.filter(c => c !== 'すべて').map(cat => (
+                  {categories.filter(c => c !== 'すべて').map(cat => (
                     <button key={cat} type="button" onClick={() => setNewItemCategory(cat)} className={`tab-item ${newItemCategory === cat ? 'active' : ''}`} style={{ border: '1px solid #fed7aa', fontSize: '0.75rem' }}>{cat}</button>
                   ))}
                 </div>
