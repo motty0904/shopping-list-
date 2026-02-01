@@ -91,11 +91,11 @@ const App = () => {
       let nextDate = null;
       let daysUntil = Infinity;
       let isNear = false;
-      if (item.lastPurchased && item.intervals && item.intervals.length > 0) {
+      if (item.last_purchased && item.intervals && item.intervals.length > 0) {
         const avgInterval = item.intervals.reduce((a, b) => a + b, 0) / item.intervals.length;
-        nextDate = addDays(new Date(item.lastPurchased), avgInterval);
+        nextDate = addDays(new Date(item.last_purchased), avgInterval);
         daysUntil = differenceInDays(nextDate, new Date());
-        isNear = daysUntil <= 3 && !item.isOut;
+        isNear = daysUntil <= 3 && !item.is_out;
       }
       return { ...item, nextDate, daysUntil, isNear, isNonCyclic: false };
     });
@@ -105,12 +105,12 @@ const App = () => {
     const item = items.find(i => i.id === id);
     if (!item) return;
 
-    const isChecking = !item.isOut;
-    let updates = { isOut: isChecking };
+    const isChecking = !item.is_out;
+    let updates = { is_out: isChecking };
 
     if (!isChecking) {
       const now = new Date();
-      const last = new Date(item.lastPurchased);
+      const last = new Date(item.last_purchased);
       const interval = differenceInDays(now, last);
       const isNonCyclic = NON_CYCLIC_CATEGORIES.includes(item.category);
       const newIntervals = (!isNonCyclic && interval > 0)
@@ -119,7 +119,7 @@ const App = () => {
 
       updates = {
         ...updates,
-        lastPurchased: now.toISOString(),
+        last_purchased: now.toISOString(),
         intervals: newIntervals
       };
     }
@@ -140,9 +140,9 @@ const App = () => {
     const newItem = {
       name: newItemName,
       category: newItemCategory,
-      lastPurchased: new Date().toISOString(),
+      last_purchased: new Date().toISOString(),
       intervals: [],
-      isOut: true,
+      is_out: true,
       emoji: predictEmoji(newItemName)
     };
 
@@ -200,8 +200,8 @@ const App = () => {
       return [...itemsWithPrediction]
         .filter(item => !NON_CYCLIC_CATEGORIES.includes(item.category))
         .sort((a, b) => {
-          if (a.isOut && !b.isOut) return -1;
-          if (!a.isOut && b.isOut) return 1;
+          if (a.is_out && !b.is_out) return -1;
+          if (!a.is_out && b.is_out) return 1;
           return a.daysUntil - b.daysUntil;
         });
     }
@@ -215,8 +215,17 @@ const App = () => {
           <div className={`sync-dot ${isSyncing ? 'animating' : ''}`} title="同期中" />
         </div>
         <motion.h1
-          animate={{ x: [0, 8, -8, 4, -4, 0], y: [0, -4, 4, -2, 2, 0], rotate: [0, 1.5, -1.5, 0.5, -0.5, 0] }}
-          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+          animate={{
+            x: [-15, 15, -10, 10, -5, 5, 0],
+            y: [-10, 5, -15, 10, -5, 0],
+            rotate: [0, 5, -5, 3, -3, 0]
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut",
+            times: [0, 0.2, 0.4, 0.6, 0.8, 0.9, 1]
+          }}
         >
           ✨ みぽりの買い物リスト ✨
         </motion.h1>
@@ -256,19 +265,19 @@ const App = () => {
                       onTouchStart={() => handleTouchStart(item.id)}
                       onTouchEnd={handleTouchEnd}
                     >
-                      <div className={`checkbox-wrapper ${item.isOut ? '' : 'checked'}`} onClick={() => handleToggleOut(item.id)}>
-                        {!item.isOut && <Check size={18} color="white" />}
+                      <div className={`checkbox-wrapper ${item.is_out ? '' : 'checked'}`} onClick={() => handleToggleOut(item.id)}>
+                        {!item.is_out && <Check size={18} color="white" />}
                       </div>
                       <div className="item-info" onClick={() => handleToggleOut(item.id)}>
                         <span className="item-category-label">{item.category}</span>
-                        <div className="item-name" style={{ textDecoration: !item.isOut ? 'line-through' : 'none', opacity: !item.isOut ? 0.5 : 1 }}>
+                        <div className="item-name" style={{ textDecoration: !item.is_out ? 'line-through' : 'none', opacity: !item.is_out ? 0.5 : 1 }}>
                           <span style={{ fontSize: '1.2rem', marginRight: 8 }}>{item.emoji}</span> {item.name}
                         </div>
                         <div className="item-meta">
                           {!item.isNonCyclic && (
                             <>
                               <Calendar size={12} />
-                              {item.lastPurchased && item.nextDate ? `予定: ${format(item.nextDate, 'M/d')}` : '学習中...'}
+                              {item.last_purchased && item.nextDate ? `予定: ${format(item.nextDate, 'M/d')}` : '学習中...'}
                               {item.isNear && <span className="remind-badge pulse"><Bell size={10} /> そろそろ</span>}
                             </>
                           )}
