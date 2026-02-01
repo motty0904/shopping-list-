@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Plus, Check, Calendar, Trash2, Bell, Sparkles, ShoppingBag, ArrowRightLeft, Wifi, X, Info, Cloud } from 'lucide-react';
-import { motion, AnimatePresence, Reorder } from 'framer-motion';
+import { motion, AnimatePresence, Reorder, useDragControls } from 'framer-motion';
 import { format, addDays, differenceInDays } from 'date-fns';
 import { ja } from 'date-fns/locale';
 
@@ -41,7 +41,7 @@ const predictEmoji = (name) => {
 
 const TabItem = ({ cat, idx, activeCategory, onClick, badgeCount }) => {
   const [isPressing, setIsPressing] = useState(false);
-  const dragControls = Reorder.useDragControls();
+  const dragControls = useDragControls();
   const timerRef = useRef(null);
 
   const handlePointerDown = (e) => {
