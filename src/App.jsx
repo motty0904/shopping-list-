@@ -113,14 +113,18 @@ const App = () => {
     const item = items.find(i => i.id === id);
     if (!item) return;
 
-    const isChecking = !item.is_out;
+    // Normalize is_out to boolean
+    const currentStatus = item.is_out ?? true;
+    const isChecking = !currentStatus;
+
     // Optimistic update
     setItems(prev => prev.map(i => i.id === id ? { ...i, is_out: isChecking } : i));
+
     let updates = { is_out: isChecking };
 
     if (!isChecking) {
       const now = new Date();
-      const last = new Date(item.last_purchased);
+      const last = item.last_purchased ? new Date(item.last_purchased) : new Date();
       const interval = differenceInDays(now, last);
       const isNonCyclic = NON_CYCLIC_CATEGORIES.includes(item.category);
       const newIntervals = (!isNonCyclic && interval > 0)
@@ -139,7 +143,11 @@ const App = () => {
         .from('items')
         .update(updates)
         .eq('id', id);
-      if (error) throw error;
+      if (error) {
+        // Rollback on error
+        fetchItems();
+        throw error;
+      }
     } catch (err) {
       console.error('Update error:', err);
     }
@@ -248,14 +256,19 @@ const App = () => {
       </header>
 
       <div className="tabs-container">
-        <Reorder.Group axis="x" values={categories} onReorder={setCategories} className="swiper-pagination-custom">
+        <Reorder.Group
+          axis="x"
+          values={categories}
+          onReorder={setCategories}
+          className="swiper-pagination-custom"
+          style={{ overflowX: 'auto', display: 'flex' }}
+        >
           {categories.map((cat, idx) => (
             <Reorder.Item
               key={cat}
               value={cat}
               className={`tab-item ${activeCategory === cat ? 'active' : ''}`}
-              onPointerDown={(e) => {
-                // Prevent click if dragging starts, but allow click for simple tap
+              onPointerDown={() => {
                 setActiveCategory(cat);
                 swiper?.slideTo(idx);
               }}
