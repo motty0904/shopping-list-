@@ -39,8 +39,9 @@ const predictEmoji = (name) => {
   return '';
 };
 
-const TabItem = ({ cat, idx, activeCategory, onClick, dragControls, badgeCount }) => {
+const TabItem = ({ cat, idx, activeCategory, onClick, badgeCount }) => {
   const [isPressing, setIsPressing] = useState(false);
+  const dragControls = Reorder.useDragControls();
   const timerRef = useRef(null);
 
   const handlePointerDown = (e) => {
@@ -51,7 +52,7 @@ const TabItem = ({ cat, idx, activeCategory, onClick, dragControls, badgeCount }
   };
 
   const handlePointerUp = () => {
-    clearTimeout(timerRef.current);
+    if (timerRef.current) clearTimeout(timerRef.current);
     setIsPressing(false);
   };
 
@@ -64,7 +65,10 @@ const TabItem = ({ cat, idx, activeCategory, onClick, dragControls, badgeCount }
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
       onPointerLeave={handlePointerUp}
-      animate={{ scale: isPressing ? 1.1 : 1 }}
+      animate={{
+        scale: isPressing ? 1.1 : 1,
+        backgroundColor: activeCategory === cat ? '#fb923c' : '#ffffff'
+      }}
       onClick={onClick}
     >
       {cat}
@@ -303,23 +307,19 @@ const App = () => {
           onReorder={setCategories}
           className="tabs-list-wrapper"
         >
-          {categories.map((cat, idx) => {
-            const dragControls = Reorder.useDragControls();
-            return (
-              <TabItem
-                key={cat}
-                cat={cat}
-                idx={idx}
-                activeCategory={activeCategory}
-                dragControls={dragControls}
-                badgeCount={getOutCount(cat)}
-                onClick={() => {
-                  setActiveCategory(cat);
-                  swiper?.slideTo(idx);
-                }}
-              />
-            );
-          })}
+          {categories.map((cat, idx) => (
+            <TabItem
+              key={cat}
+              cat={cat}
+              idx={idx}
+              activeCategory={activeCategory}
+              badgeCount={getOutCount(cat)}
+              onClick={() => {
+                setActiveCategory(cat);
+                swiper?.slideTo(idx);
+              }}
+            />
+          ))}
         </Reorder.Group>
       </div>
 
