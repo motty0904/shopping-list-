@@ -92,8 +92,9 @@ const App = () => {
 
   const itemsWithPrediction = useMemo(() => {
     return items.map(item => {
+      const isOut = item.is_out ?? true; // Default to true if null
       if (NON_CYCLIC_CATEGORIES.includes(item.category)) {
-        return { ...item, nextDate: null, daysUntil: Infinity, isNear: false, isNonCyclic: true };
+        return { ...item, is_out: isOut, nextDate: null, daysUntil: Infinity, isNear: false, isNonCyclic: true };
       }
       let nextDate = null;
       let daysUntil = Infinity;
@@ -102,9 +103,9 @@ const App = () => {
         const avgInterval = item.intervals.reduce((a, b) => a + b, 0) / item.intervals.length;
         nextDate = addDays(new Date(item.last_purchased), avgInterval);
         daysUntil = differenceInDays(nextDate, new Date());
-        isNear = daysUntil <= 3 && !item.is_out;
+        isNear = daysUntil <= 3 && !isOut;
       }
-      return { ...item, nextDate, daysUntil, isNear, isNonCyclic: false };
+      return { ...item, is_out: isOut, nextDate, daysUntil, isNear, isNonCyclic: false };
     });
   }, [items]);
 
@@ -113,6 +114,8 @@ const App = () => {
     if (!item) return;
 
     const isChecking = !item.is_out;
+    // Optimistic update
+    setItems(prev => prev.map(i => i.id === id ? { ...i, is_out: isChecking } : i));
     let updates = { is_out: isChecking };
 
     if (!isChecking) {
@@ -251,7 +254,8 @@ const App = () => {
               key={cat}
               value={cat}
               className={`tab-item ${activeCategory === cat ? 'active' : ''}`}
-              onClick={() => {
+              onPointerDown={(e) => {
+                // Prevent click if dragging starts, but allow click for simple tap
                 setActiveCategory(cat);
                 swiper?.slideTo(idx);
               }}

@@ -133,8 +133,8 @@ body {
   background: transparent;
   border: 1px solid transparent;
   user-select: none;
-  touch-action: none;
-  /* Required for framer-motion drag */
+  touch-action: pan-x;
+  /* Allow horizontal scrolling */
 }
 
 .tab-item.active {
@@ -175,6 +175,9 @@ body {
   justify-content: center;
   transition: all 0.2s ease;
   background: white;
+  margin: -10px;
+  /* Expand hit area */
+  padding: 10px;
 }
 
 .checkbox-wrapper.checked {
