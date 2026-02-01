@@ -356,7 +356,7 @@ const App = () => {
                   ))}
                 </div>
               </div>
-              <button className="submit-btn" onClick={addItem}>リストに追加</button>
+              <button className="submit-btn" onClick={(e) => { e.preventDefault(); addItem(); }}>リストに追加</button>
             </motion.div>
           </motion.div>
         )}
