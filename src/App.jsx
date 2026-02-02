@@ -172,7 +172,10 @@ const App = () => {
       const last = item.last_purchased ? new Date(item.last_purchased) : new Date();
       const interval = differenceInDays(now, last);
       const isNonCyclic = NON_CYCLIC_CATEGORIES.includes(item.category);
-      const newIntervals = (!isNonCyclic && interval > 0)
+
+      // Smart Learning: Only record intervals of 2 days or more to ignore accidental toggles
+      const shouldLearn = !isNonCyclic && interval >= 2;
+      const newIntervals = shouldLearn
         ? [...(item.intervals || []), interval].slice(-5)
         : (item.intervals || []);
 
