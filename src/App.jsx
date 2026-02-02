@@ -87,6 +87,8 @@ const App = () => {
   const [isInfoOpen, setIsInfoOpen] = useState(false);
   const [newItemName, setNewItemName] = useState('');
   const [newItemCategory, setNewItemCategory] = useState(categories[1] || '食品');
+  const [newItemStore, setNewItemStore] = useState('');
+  const [newItemPrice, setNewItemPrice] = useState('');
   const [swiper, setSwiper] = useState(null);
   const [movingItemId, setMovingItemId] = useState(null);
   const [isSyncing, setIsSyncing] = useState(false);
@@ -209,7 +211,9 @@ const App = () => {
       last_purchased: new Date().toISOString(),
       intervals: [],
       is_out: true,
-      emoji: predictEmoji(newItemName)
+      emoji: predictEmoji(newItemName),
+      store: newItemStore || null,
+      price: newItemPrice || null
     };
 
     try {
@@ -218,6 +222,8 @@ const App = () => {
         .insert([newItem]);
       if (error) throw error;
       setNewItemName('');
+      setNewItemStore('');
+      setNewItemPrice('');
       setIsModalOpen(false);
     } catch (err) {
       console.error('Add error:', err);
@@ -358,6 +364,12 @@ const App = () => {
                         <span className="item-category-label">{item.category}</span>
                         <div className="item-name" style={{ textDecoration: !item.is_out ? 'line-through' : 'none', opacity: !item.is_out ? 0.5 : 1 }}>
                           <span style={{ fontSize: '1.2rem', marginRight: 8 }}>{item.emoji}</span> {item.name}
+                          {(item.store || item.price) && (
+                            <span className="item-sub-tags">
+                              {item.store && <span className="store-tag">📍{item.store}</span>}
+                              {item.price && <span className="price-tag">￥{item.price}</span>}
+                            </span>
+                          )}
                         </div>
                         <div className="item-meta">
                           {!item.isNonCyclic && (
@@ -440,6 +452,24 @@ const App = () => {
                   {categories.filter(c => c !== 'すべて').map(cat => (
                     <button key={cat} type="button" onClick={() => setNewItemCategory(cat)} className={`tab-item ${newItemCategory === cat ? 'active' : ''}`} style={{ border: '1px solid #fed7aa', fontSize: '0.75rem' }}>{cat}</button>
                   ))}
+                </div>
+              </div>
+              <div className="form-group">
+                <label>どこで買う？</label>
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                  {['スーパー', 'ドラッグ', '100均', 'コンビニ', 'その他'].map(s => (
+                    <button key={s} type="button" onClick={() => setNewItemStore(s)} className={`chip-btn ${newItemStore === s ? 'active' : ''}`}>{s}</button>
+                  ))}
+                  {newItemStore && !['スーパー', 'ドラッグ', '100均', 'コンビニ', 'その他'].includes(newItemStore) && (
+                    <button type="button" className="chip-btn active">{newItemStore}</button>
+                  )}
+                </div>
+              </div>
+              <div className="form-group">
+                <label>底値/価格メモ</label>
+                <div style={{ position: 'relative' }}>
+                  <span style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', fontWeight: 800, color: 'var(--primary)' }}>￥</span>
+                  <input className="form-input" value={newItemPrice} onChange={e => setNewItemPrice(e.target.value)} placeholder="例: 198" style={{ paddingLeft: '35px' }} />
                 </div>
               </div>
               <button className="submit-btn" onClick={(e) => { e.preventDefault(); addItem(); }}>リストに追加</button>
