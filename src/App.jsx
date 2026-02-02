@@ -229,7 +229,9 @@ const App = () => {
       setIsModalOpen(false);
     } catch (err) {
       console.error('Add error:', err);
-      alert('追加に失敗しました。');
+      // Detailed error message to help diagnose schema issues
+      const errorMsg = err.message || '不明なエラー';
+      alert(`追加に失敗しました。理由: ${errorMsg}\n(SQLが正しく実行されているか確認してください)`);
     } finally {
       setIsAdding(false);
     }
@@ -474,12 +476,15 @@ const App = () => {
                     <motion.button
                       key={s}
                       type="button"
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => {
+                      whileTap={{ scale: 0.9 }}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
                         console.log('Store selected:', s);
                         setNewItemStore(s);
                       }}
                       className={`chip-btn ${newItemStore === s ? 'active' : ''}`}
+                      style={{ touchAction: 'manipulation' }}
                     >
                       {s}
                     </motion.button>
