@@ -457,10 +457,10 @@ const App = () => {
               <div className="form-group">
                 <label>どこで買う？</label>
                 <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                  {['スーパー', 'ドラッグ', '100均', 'コンビニ', 'その他'].map(s => (
+                  {['スパキ', 'コスモス', 'ヒロセ', '菜果', '100均'].map(s => (
                     <button key={s} type="button" onClick={() => setNewItemStore(s)} className={`chip-btn ${newItemStore === s ? 'active' : ''}`}>{s}</button>
                   ))}
-                  {newItemStore && !['スーパー', 'ドラッグ', '100均', 'コンビニ', 'その他'].includes(newItemStore) && (
+                  {newItemStore && !['スパキ', 'コスモス', 'ヒロセ', '菜果', '100均'].includes(newItemStore) && (
                     <button type="button" className="chip-btn active">{newItemStore}</button>
                   )}
                 </div>
