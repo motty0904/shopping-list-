@@ -89,6 +89,7 @@ const App = () => {
   const [newItemCategory, setNewItemCategory] = useState(categories[1] || '食品');
   const [newItemStore, setNewItemStore] = useState('');
   const [newItemPrice, setNewItemPrice] = useState('');
+  const [isAdding, setIsAdding] = useState(false);
   const [swiper, setSwiper] = useState(null);
   const [movingItemId, setMovingItemId] = useState(null);
   const [isSyncing, setIsSyncing] = useState(false);
@@ -216,6 +217,7 @@ const App = () => {
       price: newItemPrice || null
     };
 
+    setIsAdding(true);
     try {
       const { error } = await supabase
         .from('items')
@@ -227,9 +229,11 @@ const App = () => {
       setIsModalOpen(false);
     } catch (err) {
       console.error('Add error:', err);
+      alert('追加に失敗しました。');
+    } finally {
+      setIsAdding(false);
     }
   };
-
   const deleteItem = async (id) => {
     try {
       const { error } = await supabase
@@ -450,7 +454,16 @@ const App = () => {
                 <label>カテゴリ</label>
                 <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                   {categories.filter(c => c !== 'すべて').map(cat => (
-                    <button key={cat} type="button" onClick={() => setNewItemCategory(cat)} className={`tab-item ${newItemCategory === cat ? 'active' : ''}`} style={{ border: '1px solid #fed7aa', fontSize: '0.75rem' }}>{cat}</button>
+                    <motion.button
+                      key={cat}
+                      type="button"
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setNewItemCategory(cat)}
+                      className={`tab-item ${newItemCategory === cat ? 'active' : ''}`}
+                      style={{ border: '1px solid #fed7aa', fontSize: '0.75rem' }}
+                    >
+                      {cat}
+                    </motion.button>
                   ))}
                 </div>
               </div>
@@ -458,11 +471,19 @@ const App = () => {
                 <label>どこで買う？</label>
                 <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                   {['スパキ', 'コスモス', 'ヒロセ', '菜果', '100均'].map(s => (
-                    <button key={s} type="button" onClick={() => setNewItemStore(s)} className={`chip-btn ${newItemStore === s ? 'active' : ''}`}>{s}</button>
+                    <motion.button
+                      key={s}
+                      type="button"
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => {
+                        console.log('Store selected:', s);
+                        setNewItemStore(s);
+                      }}
+                      className={`chip-btn ${newItemStore === s ? 'active' : ''}`}
+                    >
+                      {s}
+                    </motion.button>
                   ))}
-                  {newItemStore && !['スパキ', 'コスモス', 'ヒロセ', '菜果', '100均'].includes(newItemStore) && (
-                    <button type="button" className="chip-btn active">{newItemStore}</button>
-                  )}
                 </div>
               </div>
               <div className="form-group">
@@ -472,7 +493,17 @@ const App = () => {
                   <input className="form-input" value={newItemPrice} onChange={e => setNewItemPrice(e.target.value)} placeholder="例: 198" style={{ paddingLeft: '35px' }} />
                 </div>
               </div>
-              <button className="submit-btn" onClick={(e) => { e.preventDefault(); addItem(); }}>リストに追加</button>
+              <motion.button
+                className={`submit-btn ${isAdding ? 'loading' : ''}`}
+                whileTap={{ scale: 0.98 }}
+                disabled={isAdding || !newItemName.trim()}
+                onClick={(e) => {
+                  e.preventDefault();
+                  addItem();
+                }}
+              >
+                {isAdding ? '追加中...' : 'リストに追加'}
+              </motion.button>
             </motion.div>
           </motion.div>
         )}

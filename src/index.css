@@ -342,6 +342,17 @@ body {
   font-weight: 800;
   margin-top: 12px;
   cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+}
+
+.submit-btn.loading {
+  background: var(--text-muted);
 }
 
 .pulse {
