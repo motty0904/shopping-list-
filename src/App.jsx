@@ -339,22 +339,24 @@ const App = () => {
         <motion.h1
           className="title"
           animate={{
-            x: [-15, 15, -15],
-            y: [-5, 5, -5],
+            x: [-60, 60, -60],
+            y: [-10, 10, -10],
             backgroundImage: titleColors,
           }}
           transition={{
-            x: { duration: 3, repeat: Infinity, ease: "easeInOut" },
-            y: { duration: 2.5, repeat: Infinity, ease: "easeInOut" },
+            x: { duration: 5, repeat: Infinity, ease: "easeInOut" },
+            y: { duration: 3, repeat: Infinity, ease: "easeInOut" },
             backgroundImage: { duration: 10, repeat: Infinity, ease: "linear" }
           }}
           style={{
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text'
+            backgroundClip: 'text',
+            width: 'max-content',
+            whiteSpace: 'nowrap'
           }}
         >
-          買わなきゃ<span className="title-accent">リスト</span>
+          ✨ みぽりの買い物リスト ✨
         </motion.h1>
         <button
           onClick={() => setIsInfoOpen(true)}

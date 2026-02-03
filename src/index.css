@@ -50,10 +50,11 @@ body {
 }
 
 .header {
-  padding: 20px;
-  backdrop-filter: blur(12px);
-  background: var(--glass);
-  border-bottom: 1px solid var(--glass-border);
+  padding: 40px 20px 20px;
+  background: white;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid #fed7aa;
   position: sticky;
   top: 0;
   z-index: 100;
