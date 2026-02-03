@@ -207,9 +207,6 @@ const App = () => {
   const addItem = async () => {
     if (!newItemName.trim()) return;
 
-    // DEBUG: Start registration
-    alert('登録処理を開始します...');
-
     const newItem = {
       name: newItemName,
       category: newItemCategory,
@@ -228,11 +225,9 @@ const App = () => {
         .insert([newItem]);
 
       if (error) {
-        alert('DBエラーが発生しました: ' + error.message);
         throw error;
       }
 
-      alert('登録が完了しました！');
       setNewItemName('');
       setNewItemStore('');
       setNewItemPrice('');
