@@ -184,6 +184,17 @@ body {
   z-index: 10;
 }
 
+.title {
+  font-size: 2.2rem;
+  font-weight: 900;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  /* background will be injected by Framer Motion */
+}
+
 .tab-item.active {
   color: white;
   background-color: var(--primary) !important;

@@ -291,26 +291,41 @@ const App = () => {
     return itemsWithPrediction.filter(item => item.category === cat);
   };
 
+  const titleColors = [
+    'linear-gradient(135deg, #fb923c, #f472b6)', // Orange to Pink
+    'linear-gradient(135deg, #38bdf8, #818cf8)', // Blue to Indigo
+    'linear-gradient(135deg, #4ade80, #2dd4bf)', // Green to Teal
+    'linear-gradient(135deg, #facc15, #fb923c)', // Yellow to Orange
+    'linear-gradient(135deg, #c084fc, #e879f9)'  // Purple to Pink
+  ];
+
   return (
-    <div className="app-container" onContextMenu={e => e.preventDefault()}>
-      <header className="header" style={{ overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', left: 20, top: '50%', transform: 'translateY(-50%)' }}>
-          <div className={`sync-dot ${isSyncing ? 'animating' : ''}`} title="同期中" />
+    <div className="app-container">
+      {isSyncing && (
+        <div className="sync-badge">
+          <RefreshCw size={12} className="spin" /> 同期中...
         </div>
+      )}
+      <header className="header">
         <motion.h1
+          className="title"
           animate={{
-            x: [-60, 60, -60],
-            y: [-10, 10, 0, -10],
-            rotate: [-5, 5, -5]
+            x: [-15, 15, -15],
+            y: [-5, 5, -5],
+            backgroundImage: titleColors,
           }}
           transition={{
-            duration: 12,
-            repeat: Infinity,
-            ease: "linear"
+            x: { duration: 3, repeat: Infinity, ease: "easeInOut" },
+            y: { duration: 2.5, repeat: Infinity, ease: "easeInOut" },
+            backgroundImage: { duration: 10, repeat: Infinity, ease: "linear" }
           }}
-          style={{ width: '100%', display: 'flex', justifyContent: 'center' }}
+          style={{
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text'
+          }}
         >
-          ✨ みぽりの買い物リスト ✨
+          買わなきゃ<span className="title-accent">リスト</span>
         </motion.h1>
         <button
           onClick={() => setIsInfoOpen(true)}
