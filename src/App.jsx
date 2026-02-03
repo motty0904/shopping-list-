@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Plus, Check, Calendar, Trash2, Bell, Sparkles, ShoppingBag, ArrowRightLeft, Wifi, X, Info, Cloud } from 'lucide-react';
+import { Plus, Check, Calendar, Trash2, Bell, Sparkles, ShoppingBag, ArrowRightLeft, Wifi, X, Info, Cloud, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence, Reorder, useDragControls } from 'framer-motion';
-import { format, addDays, differenceInDays } from 'date-fns';
+import { format, addDays, differenceInDays, isBefore, isEqual, startOfDay } from 'date-fns';
 import { ja } from 'date-fns/locale';
 
 // Styles
@@ -130,6 +130,35 @@ const App = () => {
   useEffect(() => {
     localStorage.setItem('shopping-categories', JSON.stringify(categories));
   }, [categories]);
+
+  // Auto-Relisting Logic: Check for items that should be put back on the list
+  useEffect(() => {
+    if (items.length === 0) return;
+
+    const checkAutoRelist = async () => {
+      const today = startOfDay(new Date());
+      const toUpdates = items.filter(item => {
+        if (item.is_out || !item.last_purchased || !item.intervals?.length) return false;
+        const avg = Math.round(item.intervals.reduce((a, b) => a + b, 0) / item.intervals.length);
+        const nextDate = addDays(new Date(item.last_purchased), avg);
+        return isBefore(nextDate, today) || isEqual(nextDate, today);
+      });
+
+      if (toUpdates.length > 0) {
+        console.log('Auto-relisting items:', toUpdates.map(i => i.name));
+        for (const item of toUpdates) {
+          await supabase
+            .from('items')
+            .update({ is_out: true })
+            .eq('id', item.id);
+        }
+      }
+    };
+
+    const timer = setInterval(checkAutoRelist, 1000 * 60 * 60); // Check every hour
+    checkAutoRelist(); // Initial check
+    return () => clearInterval(timer);
+  }, [items]);
 
   const getOutCount = (cat) => {
     if (cat === 'すべて') {
