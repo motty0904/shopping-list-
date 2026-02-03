@@ -206,6 +206,10 @@ const App = () => {
 
   const addItem = async () => {
     if (!newItemName.trim()) return;
+
+    // DEBUG: Start registration
+    alert('登録処理を開始します...');
+
     const newItem = {
       name: newItemName,
       category: newItemCategory,
@@ -222,7 +226,13 @@ const App = () => {
       const { error } = await supabase
         .from('items')
         .insert([newItem]);
-      if (error) throw error;
+
+      if (error) {
+        alert('DBエラーが発生しました: ' + error.message);
+        throw error;
+      }
+
+      alert('登録が完了しました！');
       setNewItemName('');
       setNewItemStore('');
       setNewItemPrice('');
@@ -471,12 +481,12 @@ const App = () => {
               </div>
               <div className="form-group">
                 <label>どこで買う？</label>
-                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginTop: '8px' }}>
                   {['スパキ', 'コスモス', 'ヒロセ', '菜果', '100均'].map(s => (
                     <motion.button
                       key={s}
                       type="button"
-                      whileTap={{ scale: 0.9 }}
+                      whileTap={{ scale: 0.85 }}
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
@@ -484,7 +494,12 @@ const App = () => {
                         setNewItemStore(s);
                       }}
                       className={`chip-btn ${newItemStore === s ? 'active' : ''}`}
-                      style={{ touchAction: 'manipulation' }}
+                      style={{
+                        touchAction: 'manipulation',
+                        padding: '14px 20px',
+                        fontSize: '1rem',
+                        minWidth: '80px'
+                      }}
                     >
                       {s}
                     </motion.button>
