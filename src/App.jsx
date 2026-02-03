@@ -339,14 +339,14 @@ const App = () => {
         <motion.h1
           className="title"
           animate={{
-            x: [-60, 60, -60],
-            y: [-10, 10, -10],
+            x: [-70, 70],
+            y: [-25, 25],
             backgroundImage: titleColors,
           }}
           transition={{
-            x: { duration: 5, repeat: Infinity, ease: "easeInOut" },
-            y: { duration: 3, repeat: Infinity, ease: "easeInOut" },
-            backgroundImage: { duration: 10, repeat: Infinity, ease: "linear" }
+            x: { duration: 4.3, repeat: Infinity, repeatType: "reverse", ease: "linear" },
+            y: { duration: 3.1, repeat: Infinity, repeatType: "reverse", ease: "linear" },
+            backgroundImage: { duration: 8, repeat: Infinity, ease: "linear" }
           }}
           style={{
             WebkitBackgroundClip: 'text',
